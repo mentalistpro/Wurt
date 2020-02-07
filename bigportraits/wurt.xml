@@ -1,0 +1,6 @@
+<Atlas>
+	<Texture filename="wurt.tex" />
+	<Elements>
+		<Element name="wurt.tex" u1="0" u2=".52" v1="0.3" v2=".99" />
+	</Elements>
+</Atlas>
