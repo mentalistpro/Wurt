@@ -5,7 +5,6 @@ local assets =
     Asset("ANIM", "anim/player_idles_wurt.zip"),
     Asset("ANIM", "anim/wurt_powerup.zip"),
     Asset("ANIM", "anim/wurt.zip"),
-    Asset("SCRIPT", "scripts/prefabs/player_common.lua"),
     Asset("SOUND", "sound/wurt.fsb"),
 }
 
@@ -67,10 +66,34 @@ end
 
 ------------------------------------------------------------------------------------------------
 
-local function UpdateTentacleWarnings(inst)
-	local disable = (inst.replica.inventory ~= nil and not inst.replica.inventory:IsVisible())
+local sqrt = math.sqrt
 
-	if not disable then
+local function VecUtil_Length(p1_x, p1_z)
+    return sqrt(p1_x * p1_x + p1_z * p1_z)
+end
+
+local function ErodeAway(inst, erode_time)
+    local time_to_erode = erode_time or 1
+    local tick_time = TheSim:GetTickTime()
+
+    if inst.DynamicShadow ~= nil then
+        inst.DynamicShadow:Enable(false)
+    end
+
+    inst:StartThread(function()
+        local ticks = 0
+        while ticks * tick_time < time_to_erode do
+            local erode_amount = ticks * tick_time / time_to_erode
+            inst.AnimState:SetErosionParams(erode_amount, 0.1, 1.0)
+            ticks = ticks + 1
+            Yield()
+        end
+        inst:Remove()
+    end)
+end
+
+local function UpdateTentacleWarnings(inst)
+	if not inst.components.inventory ~= nil then
 		local old_warnings = {}
 		for t, w in pairs(inst._active_warnings) do
 			old_warnings[t] = w
@@ -78,13 +101,13 @@ local function UpdateTentacleWarnings(inst)
 
 		local x, y, z = inst.Transform:GetWorldPosition()
 		local warn_dist = 15
-		local tentacles = TheSim:FindEntities(x, y, z, warn_dist, {"tentacle", "invisible"})
+		local tentacles = TheSim:FindEntities(x, y, z, warn_dist, {"WORM_DANGER"})
 		for i, t in ipairs(tentacles) do
 			local p1x, p1y, p1z = inst.Transform:GetWorldPosition()
 			local p2x, p2y, p2z = t.Transform:GetWorldPosition()
 			local dist = VecUtil_Length(p1x - p2x, p1z - p2z)
 
-			if t.replica.health ~= nil and not t.replica.health:IsDead() then
+			if t.components.health ~= nil and not t.components.health:IsDead() then
 				if inst._active_warnings[t] == nil then
 					local fx = SpawnPrefab("wurt_tentacle_warning")
 					fx.entity:SetParent(t.entity)
@@ -101,6 +124,7 @@ local function UpdateTentacleWarnings(inst)
 				ErodeAway(w, 0.5)
 			end
 		end
+	
 	elseif next(inst._active_warnings) ~= nil then
 		for t, w in pairs(inst._active_warnings) do
 			if w:IsValid() then
@@ -126,24 +150,11 @@ local function DisableTentacleWarning(inst)
 end
 
 local function EnableTentacleWarning(inst)
-	if inst.player_classified ~= nil then
-		inst:ListenForEvent("playerdeactivated", DisableTentacleWarning)
+
 		if inst.tentacle_warning_task == nil then
 			inst.tentacle_warning_task = inst:DoPeriodicTask(0.1, UpdateTentacleWarnings)
 		end
-	else
-	    inst:RemoveEventCallback("playeractivated", EnableTentacleWarning)
-	end
-end
 
-local function SetGhostMode(inst, isghost)
-    if isghost then
-		DisableTentacleWarning(inst)
-        inst._SetGhostMode(inst, true)
-    else
-        inst._SetGhostMode(inst, false)
-		EnableTentacleWarning(inst)
-    end
 end
 
 ------------------------------------------------------------------------------------------------
@@ -190,13 +201,13 @@ local function OnPreLoad(inst, data)
     end
 end
 
---[[local function OnRespawn(inst)
+local function OnRespawn(inst)
     if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
         inst.overrideskinmode = "powerup"
     else
         inst.overrideskinmode = nil
     end
-end]]
+end
 
 ------------------------------------------------------------------------------------------------
 
@@ -206,7 +217,7 @@ local function fn(inst)
     inst:AddTag("mermguard")			--will be considered as mermguard by mermking
     inst:AddTag("mermfluent")			--will be able to interpret merm language
     inst:AddTag("merm_builder")			--will be able to build merm buildings
-    inst:AddTag("wet")					--will be considered as a wet entity (but not functionable)
+    inst:AddTag("wet")					--will be considered as a wet entity
     --inst:AddTag("stronggrip")			--will be able to hold inventory items despite falling into water
 
     inst.customidleanim = "idle_wurt"
@@ -249,6 +260,10 @@ local function fn(inst)
 
     inst.OnSave = OnSave
     inst.OnPreLoad = OnPreLoad
+	
+	inst._active_warnings = {}
+	EnableTentacleWarning(inst)
+	UpdateTentacleWarnings(inst)
 
     --[[if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
         inst:DoTaskInTime(0, function() RoyalUpgrade(inst) end)
