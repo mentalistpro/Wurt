@@ -2,9 +2,11 @@ local MakePlayerCharacter = require("prefabs/player_common")
 
 local assets =
 {
+    Asset("ANIM", "anim/player_idles_wurt.zip"),
+    Asset("ANIM", "anim/wurt_powerup.zip"),
+    Asset("ANIM", "anim/wurt.zip"),
     Asset("SCRIPT", "scripts/prefabs/player_common.lua"),
     Asset("SOUND", "sound/wurt.fsb"),
-    Asset("ANIM", "anim/wurt.zip")
 }
 
 local prefabs =
