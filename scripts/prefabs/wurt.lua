@@ -5,7 +5,7 @@ local assets =
     Asset("ANIM", "anim/player_idles_wurt.zip"),
     Asset("ANIM", "anim/wurt_powerup.zip"),
     Asset("ANIM", "anim/wurt.zip"),
-    Asset("SOUND", "sound/wurt.fsb"),
+    --Asset("SOUND", "sound/wurt.fsb"),
 }
 
 local prefabs =
@@ -211,40 +211,47 @@ local function OnRespawn(inst)
     end
 end
 
+local function IsMermBuilder(inst)
+	if GetPlayer() then
+		inst.components.sanity:DoDelta(5)
+	end
+end
+
+--[[local function test_ground(inst)
+	local x, y, z = GetPlayer().Transform:GetWorldPosition()
+	
+	if GetWorld().Map:GetTileAtPoint( x, y, z ) == GROUND.MARSH then
+		inst.components.locomotor.runspeed = 7.8
+		print("onmarsh yay")
+	else
+		inst.components.locomotor.runspeed = 6
+		print("onground shit")
+	end
+end]]
+
 ------------------------------------------------------------------------------------------------
 
 local function fn(inst)
-    inst:AddTag("playermerm")			
-    inst:AddTag("merm")					
-    inst:AddTag("mermguard")			
-    inst:AddTag("mermfluent")			
-    inst:AddTag("merm_builder")			
-    inst:AddTag("wet")					
-    --inst:AddTag("stronggrip")			--will be able to hold inventory items despite falling into water
+    inst:AddTag("playermerm")			--Wurt is a player, just a tag, no function.
+	inst:AddTag("marshwalker")			--Wurt walks on marsh turfs quickly, see IsMarshWalker in this file.
+    inst:AddTag("merm")					--Wurt is a merm.
+    inst:AddTag("mermbuilder")			--Wurt receives sanity when merm structure is built, different from DST due to Mermhouse Crafting mod, see IsMermBuilder in this file.
+    inst:AddTag("mermfluent")			--Wurt is fluent in merm langugage, see Befriendable Merm mod.
+    inst:AddTag("mermguard")			--Wurt is a merm guard, see Befriendable Merm mod.
+    inst:AddTag("wet")					--Wurt is a wet entity.
+    inst:AddTag("stronggrip")			--Wurt is immortal if boat sinks, see HasStrongGrip in this file.
 
-    inst.customidleanim = "idle_wurt"
-
-	
-    --[[inst:AddComponent("foodaffinity")
-    inst.components.foodaffinity:AddFoodtypeAffinity(FOODTYPE.VEGGIE, 1.33)
+    inst:AddComponent("foodaffinity")
+    inst.components.foodaffinity:AddFoodtypeAffinity("VEGGIE", 1.33)
+    inst.components.foodaffinity:AddFoodtypeAffinity("ROUGHAGE", 1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp",          1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp_cooked",   1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp_dried",    1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("durian",        1.6 )
-    inst.components.foodaffinity:AddPrefabAffinity  ("durian_cooked", 1.6 )]]
+    inst.components.foodaffinity:AddPrefabAffinity  ("durian_cooked", 1.6 )
 	
-	inst:AddComponent("eater")
 	inst.components.eater:SetVegetarian()
-		
-    --[[inst:AddComponent("itemaffinity")
-    inst.components.itemaffinity:AddAffinity("hutch_fishbowl", nil, TUNING.DAPPERNESS_MED, 1)
-    inst.components.itemaffinity:AddAffinity(nil, "fish", TUNING.DAPPERNESS_MED, 1)
-    inst.components.itemaffinity:AddAffinity(nil, "fishmeat", -TUNING.DAPPERNESS_MED_LARGE, 2)
-    inst.components.itemaffinity:AddAffinity(nil, "spoiled_fish", -TUNING.DAPPERNESS_MED_LARGE, 2)]]
-
-	inst:AddComponent("locomotor")
-	inst.components.locomotor:SetFasterOnGroundTile(GROUND.MARSH, true)
-
+				
 	inst:AddComponent("preserver")
 	inst.components.preserver:SetPerishRateMultiplier(FishPreserverRate)
 
@@ -255,7 +262,11 @@ local function fn(inst)
     inst.peruse_sleep = peruse_sleep
     inst.peruse_gardening = peruse_gardening
 	
-	inst:ListenForEvent("ms_respawnedfromghost", OnRespawn)
+	--//NOT WORKING
+	--test_ground(inst)
+
+	inst.ismermbuilder = IsMermBuilder
+
     inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
     inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())
 
@@ -268,7 +279,7 @@ local function fn(inst)
     else
         inst:DoTaskInTime(0, function() RoyalDowngrade(inst) end)
     end
-	
+		
 	local disguisehat_recipe = Recipe(
 		"disguisehat", 
 		{
