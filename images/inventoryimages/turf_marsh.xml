@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+	<Texture filename="turf_marsh.tex" />
+	<Elements>
+		<Element name="turf_marsh.tex" u1="0.0078125" u2="0.9921875" v1="0.0078125" v2="0.9921875" />
+	</Elements>
+</Atlas>
