@@ -20,6 +20,13 @@ local start_inv =
 
 ------------------------------------------------------------------------------------------------
 
+--//CONTENT//
+--1. Stats
+--2. Tentacle warning
+
+------------------------------------------------------------------------------------------------
+--1. Stats
+
 local function UpdateStats(inst, maxhealth, maxhunger, maxsanity)
 
     local current_health = inst.health_percent or inst.components.health:GetPercent()
@@ -41,7 +48,6 @@ local function UpdateStats(inst, maxhealth, maxhunger, maxsanity)
 end
 
 local function RoyalUpgrade(inst, silent)
-    
     UpdateStats(inst, TUNING.WURT_HEALTH_KINGBONUS, TUNING.WURT_HUNGER_KINGBONUS, TUNING.WURT_SANITY_KINGBONUS)
 
     if not silent and not inst.royal then
@@ -53,7 +59,6 @@ local function RoyalUpgrade(inst, silent)
 end
 
 local function RoyalDowngrade(inst, silent)
-
     UpdateStats(inst, TUNING.WURT_HEALTH, TUNING.WURT_HUNGER, TUNING.WURT_SANITY)
 
     if not silent and inst.royal then
@@ -65,11 +70,10 @@ local function RoyalDowngrade(inst, silent)
 end
 
 ------------------------------------------------------------------------------------------------
-
-local sqrt = math.sqrt
+--2. Tentacle warning
 
 local function VecUtil_Length(p1_x, p1_z)
-    return sqrt(p1_x * p1_x + p1_z * p1_z)
+    return math.sqrt(p1_x * p1_x + p1_z * p1_z)
 end
 
 local function ErodeAway(inst, erode_time)
@@ -150,11 +154,9 @@ local function DisableTentacleWarning(inst)
 end
 
 local function EnableTentacleWarning(inst)
-
-		if inst.tentacle_warning_task == nil then
-			inst.tentacle_warning_task = inst:DoPeriodicTask(0.1, UpdateTentacleWarnings)
-		end
-
+	if inst.tentacle_warning_task == nil then
+		inst.tentacle_warning_task = inst:DoPeriodicTask(0.1, UpdateTentacleWarnings)
+	end
 end
 
 ------------------------------------------------------------------------------------------------
@@ -212,18 +214,17 @@ end
 ------------------------------------------------------------------------------------------------
 
 local function fn(inst)
-    inst:AddTag("playermerm")			--just a tag without function
-    inst:AddTag("merm")					--will be considered as merm by other merms
-    inst:AddTag("mermguard")			--will be considered as mermguard by mermking
-    inst:AddTag("mermfluent")			--will be able to interpret merm language
-    inst:AddTag("merm_builder")			--will be able to build merm buildings
-    inst:AddTag("wet")					--will be considered as a wet entity
+    inst:AddTag("playermerm")			
+    inst:AddTag("merm")					
+    inst:AddTag("mermguard")			
+    inst:AddTag("mermfluent")			
+    inst:AddTag("merm_builder")			
+    inst:AddTag("wet")					
     --inst:AddTag("stronggrip")			--will be able to hold inventory items despite falling into water
 
     inst.customidleanim = "idle_wurt"
 
-    inst:AddComponent("reader")
-
+	
     --[[inst:AddComponent("foodaffinity")
     inst.components.foodaffinity:AddFoodtypeAffinity(FOODTYPE.VEGGIE, 1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp",          1.33)
@@ -231,45 +232,42 @@ local function fn(inst)
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp_dried",    1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("durian",        1.6 )
     inst.components.foodaffinity:AddPrefabAffinity  ("durian_cooked", 1.6 )]]
-
+	
+	inst:AddComponent("eater")
+	inst.components.eater:SetVegetarian()
+		
     --[[inst:AddComponent("itemaffinity")
     inst.components.itemaffinity:AddAffinity("hutch_fishbowl", nil, TUNING.DAPPERNESS_MED, 1)
     inst.components.itemaffinity:AddAffinity(nil, "fish", TUNING.DAPPERNESS_MED, 1)
     inst.components.itemaffinity:AddAffinity(nil, "fishmeat", -TUNING.DAPPERNESS_MED_LARGE, 2)
     inst.components.itemaffinity:AddAffinity(nil, "spoiled_fish", -TUNING.DAPPERNESS_MED_LARGE, 2)]]
 
-	--inst:AddComponent("preserver")
-	--inst.components.preserver:SetPerishRateMultiplier(FishPreserverRate)
+	inst:AddComponent("locomotor")
+	inst.components.locomotor:SetFasterOnGroundTile(GROUND.MARSH, true)
 
-    if inst.components.eater ~= nil then
-        --inst.components.eater:SetDiet({ FOODGROUP.VEGETARIAN }, { FOODGROUP.VEGETARIAN })
-    end
+	inst:AddComponent("preserver")
+	inst.components.preserver:SetPerishRateMultiplier(FishPreserverRate)
 
-	--inst.components.locomotor:SetFasterOnGroundTile(GROUND.MARSH, true)
-
-    inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
-    inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())
-
-    --inst:ListenForEvent("ms_respawnedfromghost", OnRespawn)
-
+    inst:AddComponent("reader")
     inst.peruse_brimstone = peruse_brimstone
     inst.peruse_birds = peruse_birds
     inst.peruse_tentacles = peruse_tentacles
     inst.peruse_sleep = peruse_sleep
     inst.peruse_gardening = peruse_gardening
-
-    inst.OnSave = OnSave
-    inst.OnPreLoad = OnPreLoad
 	
+	inst:ListenForEvent("ms_respawnedfromghost", OnRespawn)
+    inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
+    inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())
+
 	inst._active_warnings = {}
 	EnableTentacleWarning(inst)
 	UpdateTentacleWarnings(inst)
 
-    --[[if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
+    if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
         inst:DoTaskInTime(0, function() RoyalUpgrade(inst) end)
     else
         inst:DoTaskInTime(0, function() RoyalDowngrade(inst) end)
-    end]]
+    end
 	
 	local disguisehat_recipe = Recipe(
 		"disguisehat", 
@@ -282,6 +280,9 @@ local function fn(inst)
 		TECH.NONE, 
 		"common")
 		disguisehat_recipe.sortkey = 1
+		
+	inst.OnSave = OnSave
+    inst.OnPreLoad = OnPreLoad
 end
 
 return MakePlayerCharacter("wurt", prefabs, assets, fn, start_inv)
