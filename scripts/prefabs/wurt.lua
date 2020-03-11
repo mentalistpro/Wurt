@@ -222,12 +222,20 @@ local function fishlover(inst, item)
 	--GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "FISH_LOVE"))            		
 end
 
---[[local function fishpresever(inst, item)
-	if item and item:HasTag("fish") then
-	
-	return (item ~= nil and item:HasTag("fish")) and TUNING.WURT_FISH_PRESERVER_RATE or nil
-end]]
-
+local function OnEat(inst, food)
+	if food.components.edible and food.components.edible.foodtype == "VEGGIE" then
+		inst.components.sanity:DoDelta(15)
+		inst.components.hunger:DoDelta(15)
+	end
+	if food.components.edible and food.components.edible.foodtype == "VEGGIE" then
+		inst.components.sanity:DoDelta(15)
+		inst.components.hunger:DoDelta(15)
+	end
+	if food.components.edible and food.components.edible.foodtype == "VEGGIE" then
+		inst.components.sanity:DoDelta(15)
+		inst.components.hunger:DoDelta(15)
+	end 
+end
 
 ------------------------------------------------------------------------------------------------
 
@@ -250,8 +258,10 @@ local function fn(inst)
     inst.components.foodaffinity:AddPrefabAffinity  ("durian",        1.6 )
     inst.components.foodaffinity:AddPrefabAffinity  ("durian_cooked", 1.6 )
 	
+	
 	inst.components.eater:SetVegetarian()
-				
+	inst.components.eater:SetOnEatFn(OnEat)
+		
     inst:AddComponent("reader")
     inst.peruse_brimstone = peruse_brimstone
     inst.peruse_birds = peruse_birds
