@@ -161,10 +161,6 @@ end
 
 ------------------------------------------------------------------------------------------------
 
-local function FishPreserverRate(inst, item)
-	return (item ~= nil and item:HasTag("fish")) and TUNING.WURT_FISH_PRESERVER_RATE or nil
-end
-
 local function peruse_brimstone(inst)
     inst.components.sanity:DoDelta(-TUNING.SANITY_LARGE)
 end
@@ -218,6 +214,21 @@ local function mermbuilderfn(inst)
 	GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "BUILD_MERMSTRUCTURES"))            
 end
 
+local function fishlover(inst, item)
+	local item = inst.components.inventoryitem
+	if item and item:HasTag("fish") then
+		inst.components.sanity:DoDelta(TUNING.DAPPERNESS_MED)
+	end
+	--GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "FISH_LOVE"))            		
+end
+
+--[[local function fishpresever(inst, item)
+	if item and item:HasTag("fish") then
+	
+	return (item ~= nil and item:HasTag("fish")) and TUNING.WURT_FISH_PRESERVER_RATE or nil
+end]]
+
+
 ------------------------------------------------------------------------------------------------
 
 local function fn(inst)
@@ -241,9 +252,6 @@ local function fn(inst)
 	
 	inst.components.eater:SetVegetarian()
 				
-	inst:AddComponent("preserver")
-	inst.components.preserver:SetPerishRateMultiplier(FishPreserverRate)
-
     inst:AddComponent("reader")
     inst.peruse_brimstone = peruse_brimstone
     inst.peruse_birds = peruse_birds
@@ -252,6 +260,8 @@ local function fn(inst)
     inst.peruse_gardening = peruse_gardening
 	
 	inst.mermbuilderfn = mermbuilderfn
+    inst:ListenForEvent("gotnewitem", fishlover)
+    --inst:ListenForEvent("gotnewitem", fishpresever)
 
     inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
     inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())
@@ -266,7 +276,7 @@ local function fn(inst)
         inst:DoTaskInTime(0, function() RoyalDowngrade(inst) end)
     end
 		
-	local disguisehat_recipe = Recipe(
+	--[[local disguisehat_recipe = Recipe(
 		"disguisehat", 
 		{
 		Ingredient("twigs", 2), 
@@ -276,7 +286,7 @@ local function fn(inst)
 		RECIPETABS.DRESS, 
 		TECH.NONE, 
 		"common")
-		disguisehat_recipe.sortkey = 1
+		disguisehat_recipe.sortkey = 1]]
 		
 	inst.OnSave = OnSave
     inst.OnPreLoad = OnPreLoad
