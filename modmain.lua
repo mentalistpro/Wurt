@@ -19,7 +19,7 @@ AddMinimapAtlas("minimap/wurt.xml")
 --//CONTENT//
 --#1 Character
 --#2 Tuning
---#3 Strings
+--#3 Wurt perks
 
 ------------------------------------------------------------------------------------------------
 --#1 Character
@@ -32,22 +32,6 @@ _S.CHARACTER_TITLES.wurt = "The Half-Pint"
 _S.CHARACTER_NAMES.wurt = "Wurt"
 _S.CHARACTER_DESCRIPTIONS.wurt = "*At home in the swamp \n*Has big plans for Merm-kind \n*Is a vegetarian"
 _S.CHARACTER_QUOTES.wurt = "\"Mermfolk known for hos-per-tality, florp.\""
-	
-	--//TODO: Chinese localisation
-	--[[if _G.WURT_MOD_LAN == true then 
-		_S.CHARACTER_TITLES.wurt = "The Half-Pint"
-		_S.CHARACTER_NAMES.wurt = "wurt"
-		_S.CHARACTER_DESCRIPTIONS.wurt = "*At home in the swamp \n*Has big plans for Merm-kind \n*Is a vegetarian"
-		_S.CHARACTER_QUOTES.wurt = "Mermfolk known for hos-per-tality, florp."
-		_S.CHARACTERS.WURT = require "speech_wurt"
-	else
-		_S.CHARACTER_TITLES.wurt = "小矮魚人"
-		_S.CHARACTER_NAMES.wurt = "沃特"
-		_S.CHARACTER_DESCRIPTIONS.wurt = "*可以在沼澤建家。\n*可以創立新魚人王朝。\n*是一個素食主義者。"
-		_S.CHARACTER_QUOTES.wurt = "魚人們以好客聞名，浮浪特。"
-		_S.CHARACTERS.WURT = require "speech_wurt_zh"
-	end]]
-
 _S.CHARACTERS.WURT = require "speech_wurt"
 _S.NAMES.WURT = "Wurt"
 
@@ -67,27 +51,28 @@ TUNING.WURT_SANITY_KINGBONUS = 200
 
 TUNING.WURT_FISH_PRESERVER_RATE = 1/4
 
-TUNING.DAPPERNESS_MED = 100/(300*6)
-TUNING.DAPPERNESS_MED_LARGE = 100/(300*4.5)
-
 ------------------------------------------------------------------------------------------------
---#3 Define new actions.build, inst.mermbuilder, components/deployable so wurt gains 5 sanity when building structure with tag mermstructures
+--#3 Wurt perks
 
+local GetClock = _G.GetClock
 local GetPlayer = _G.GetPlayer
+local GetSeasonManager = _G.GetSeasonManager
 local GetWorld = _G.GetWorld
 local GROUND = _G.GROUND
 local RoadManager = _G.RoadManager
+local TheSim = _G.TheSim
+
+--Wurt's movement speed == faster on marsh
 
 AddComponentPostInit("locomotor",
 	function(self)	
-		local UpdateGroundSpeedMultiplier_old = self:UpdateGroundSpeedMultiplier()
-		
 		function self:UpdateGroundSpeedMultiplier()			
 			self.groundspeedmultiplier = 1
 			local ground = GetWorld()
 			local player = GetPlayer()
 			local oncreep = ground ~= nil and ground.GroundCreep:OnCreep(self.inst.Transform:GetWorldPosition())
 			local x,y,z = self.inst.Transform:GetWorldPosition()
+			
 			if oncreep then
 				-- if this ever needs to happen when self.enablegroundspeedmultiplier is set, need to move the check for self.enablegroundspeedmultiplier above
 				if self.triggerscreep and not self.wasoncreep then
@@ -107,12 +92,92 @@ AddComponentPostInit("locomotor",
 						local tile = ground.Map:GetTileAtPoint(x,0,z)		
 						if tile and tile == GROUND.ROAD then
 							self.groundspeedmultiplier = self.fastmultiplier
+						--Wurt has fastmultiplier on marsh ground
 						elseif tile and tile == GROUND.MARSH and player.prefab == "wurt" then
 							self.groundspeedmultiplier = self.fastmultiplier					
 						end
 					end
 				end
 			end
+		end
+	end
+)
+
+--Wurt's sanity calculation == less affected by rain, prefer living fish, hate dead fish
+
+AddComponentPostInit("sanity",
+	function(self)	
+		function self:Recalc(dt)
+			local total_dapperness = self.dapperness or 0
+			local mitigates_rain = false
+			
+
+			for k,v in pairs (self.inst.components.inventory.equipslots) do
+				if v.components.dapperness then
+					total_dapperness = total_dapperness + v.components.dapperness:GetDapperness(self.inst)
+					if v.components.dapperness.mitigates_rain then
+						mitigates_rain = true
+					end
+				end		
+			end
+			
+			local dapper_delta = total_dapperness*TUNING.SANITY_DAPPERNESS
+			
+			local light_delta = 0
+			local lightval = self.inst.LightWatcher:GetLightValue()
+			
+			local day = GetClock():IsDay() and not GetWorld():IsCave()
+			
+			if day then 
+				light_delta = TUNING.SANITY_DAY_GAIN
+			else	
+				local highval = TUNING.SANITY_HIGH_LIGHT
+				local lowval = TUNING.SANITY_LOW_LIGHT
+
+				if lightval > highval then
+					light_delta =  TUNING.SANITY_NIGHT_LIGHT
+				elseif lightval < lowval then
+					light_delta = TUNING.SANITY_NIGHT_DARK
+				else
+					light_delta = TUNING.SANITY_NIGHT_MID
+				end
+
+				light_delta = light_delta*self.night_drain_mult
+			end
+			
+			local aura_delta = 0
+			local x,y,z = self.inst.Transform:GetWorldPosition()
+			local ents = TheSim:FindEntities(x,y,z, TUNING.SANITY_EFFECT_RANGE, nil, {"FX", "NOCLICK", "DECOR","INLIMBO"} )
+			for k,v in pairs(ents) do 
+				if v.components.sanityaura and v ~= self.inst then
+					local distsq = self.inst:GetDistanceSqToInst(v)
+					local aura_val = v.components.sanityaura:GetAura(self.inst)/math.max(1, distsq)
+					if aura_val < 0 then
+						aura_val = aura_val * self.neg_aura_mult
+					end
+
+					aura_delta = aura_delta + aura_val
+				end
+			end
+
+
+			local rain_delta = 0
+			if GetSeasonManager() and GetSeasonManager():IsRaining() and not mitigates_rain then
+				--Wurt suffers 50% less penalty from being wet
+				if GetPlayer().prefab == "wurt" then
+					rain_delta = 0.5*(-TUNING.DAPPERNESS_MED*1.5* GetSeasonManager():GetPrecipitationRate())		
+				else
+					rain_delta = -TUNING.DAPPERNESS_MED*1.5* GetSeasonManager():GetPrecipitationRate()
+				end
+			end
+
+			self.rate = (dapper_delta + light_delta + aura_delta + rain_delta)	
+			
+			if self.custom_rate_fn then
+				self.rate = self.rate + self.custom_rate_fn(self.inst)
+			end
+
+			self:DoDelta(self.rate*dt, true)
 		end
 	end
 )
