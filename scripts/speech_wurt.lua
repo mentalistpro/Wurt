@@ -1193,6 +1193,7 @@ return{
 		BOARDS = "Tree pieces for building, florp.",
 		BONESHARD = "Piece of something dead.",
 		BONESTEW = "Glurgh.",
+		BUILD_MERMSTRUCTURES = "Built it with own claws!",
 		BUGNET = "Wanna catch bugs!",
 		BUSHHAT = "Can't see me!!",
 		BUTTER = "Taste like bugs... not bad, florp.",

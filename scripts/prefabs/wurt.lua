@@ -211,23 +211,12 @@ local function OnRespawn(inst)
     end
 end
 
-local function IsMermBuilder(inst)
+local function mermbuilderfn(inst)
 	if GetPlayer() then
 		inst.components.sanity:DoDelta(5)
 	end
+	GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "BUILD_MERMSTRUCTURES"))            
 end
-
---[[local function test_ground(inst)
-	local x, y, z = GetPlayer().Transform:GetWorldPosition()
-	
-	if GetWorld().Map:GetTileAtPoint( x, y, z ) == GROUND.MARSH then
-		inst.components.locomotor.runspeed = 7.8
-		print("onmarsh yay")
-	else
-		inst.components.locomotor.runspeed = 6
-		print("onground shit")
-	end
-end]]
 
 ------------------------------------------------------------------------------------------------
 
@@ -262,10 +251,7 @@ local function fn(inst)
     inst.peruse_sleep = peruse_sleep
     inst.peruse_gardening = peruse_gardening
 	
-	--//NOT WORKING
-	--test_ground(inst)
-
-	inst.ismermbuilder = IsMermBuilder
+	inst.mermbuilderfn = mermbuilderfn
 
     inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
     inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())

@@ -73,14 +73,19 @@ TUNING.DAPPERNESS_MED_LARGE = 100/(300*4.5)
 ------------------------------------------------------------------------------------------------
 --#3 Define new actions.build, inst.mermbuilder, components/deployable so wurt gains 5 sanity when building structure with tag mermstructures
 
+local GetPlayer = _G.GetPlayer
+local GetWorld = _G.GetWorld
+local GROUND = _G.GROUND
+local RoadManager = _G.RoadManager
+
 AddComponentPostInit("locomotor",
 	function(self)	
-		--local UpdateGroundSpeedMultiplier_old = self:UpdateGroundSpeedMultiplier()
-		--UpdateGroundSpeedMultiplier_old()
+		local UpdateGroundSpeedMultiplier_old = self:UpdateGroundSpeedMultiplier()
+		
 		function self:UpdateGroundSpeedMultiplier()			
 			self.groundspeedmultiplier = 1
-			local ground = _G.GetWorld()
-			local player = _G.GetPlayer()
+			local ground = GetWorld()
+			local player = GetPlayer()
 			local oncreep = ground ~= nil and ground.GroundCreep:OnCreep(self.inst.Transform:GetWorldPosition())
 			local x,y,z = self.inst.Transform:GetWorldPosition()
 			if oncreep then
@@ -96,14 +101,13 @@ AddComponentPostInit("locomotor",
 			else
 				self.wasoncreep = false
 				if self.fasteronroad then
-					--print(self.inst, "UpdateGroundSpeedMultiplier check road" )
-					if _G.RoadManager and _G.RoadManager:IsOnRoad( x,0,z ) then
+					if RoadManager and RoadManager:IsOnRoad( x,0,z ) then
 						self.groundspeedmultiplier = self.fastmultiplier
 					elseif ground ~= nil then
 						local tile = ground.Map:GetTileAtPoint(x,0,z)		
-						if tile and tile == _G.GROUND.ROAD then
+						if tile and tile == GROUND.ROAD then
 							self.groundspeedmultiplier = self.fastmultiplier
-						elseif tile and tile == _G.GROUND.MARSH and player.prefab == "wurt" then
+						elseif tile and tile == GROUND.MARSH and player.prefab == "wurt" then
 							self.groundspeedmultiplier = self.fastmultiplier					
 						end
 					end
@@ -112,3 +116,5 @@ AddComponentPostInit("locomotor",
 		end
 	end
 )
+
+
