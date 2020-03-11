@@ -62,14 +62,13 @@ local GROUND = _G.GROUND
 local RoadManager = _G.RoadManager
 local TheSim = _G.TheSim
 
---Wurt's movement speed == faster on marsh
+--Wurt's movement speed calculation
 
 AddComponentPostInit("locomotor",
 	function(self)	
 		function self:UpdateGroundSpeedMultiplier()			
 			self.groundspeedmultiplier = 1
 			local ground = GetWorld()
-			local player = GetPlayer()
 			local oncreep = ground ~= nil and ground.GroundCreep:OnCreep(self.inst.Transform:GetWorldPosition())
 			local x,y,z = self.inst.Transform:GetWorldPosition()
 			
@@ -93,7 +92,7 @@ AddComponentPostInit("locomotor",
 						if tile and tile == GROUND.ROAD then
 							self.groundspeedmultiplier = self.fastmultiplier
 						--Wurt has fastmultiplier on marsh ground
-						elseif tile and tile == GROUND.MARSH and player.prefab == "wurt" then
+						elseif tile and tile == GROUND.MARSH and self.inst.prefab == "wurt" then
 							self.groundspeedmultiplier = self.fastmultiplier					
 						end
 					end
@@ -103,15 +102,36 @@ AddComponentPostInit("locomotor",
 	end
 )
 
---Wurt's sanity calculation == less affected by rain, prefer living fish, hate dead fish
+--Wurt's sanity calculation
+
+local function isfish(inst)
+	inst:AddTag("fish")
+	inst:AddComponent("dapperness")
+	inst.components.dapperness.dapperness = TUNING.DAPPERNESS_MED
+end
+
+AddPrefabPostInit("eel", isfish)
+AddPrefabPostInit("fish", isfish)
+AddPrefabPostInit("tropical_fish", isfish)
+
+local function isdeadfish(inst)
+	inst:AddTag("deadfish")
+	inst:AddComponent("dapperness")
+	inst.components.dapperness.dapperness = -TUNING.DAPPERNESS_LARGE/1.5
+end
+
+AddPrefabPostInit("fish_cooked", isdeadfish)
+AddPrefabPostInit("fish_raw_small", isdeadfish)
+AddPrefabPostInit("fish_raw_small_cooked", isdeadfish)
+AddPrefabPostInit("fishsticks", isdeadfish)
+AddPrefabPostInit("fishtacos", isdeadfish)
 
 AddComponentPostInit("sanity",
 	function(self)	
 		function self:Recalc(dt)
 			local total_dapperness = self.dapperness or 0
-			local mitigates_rain = false
+			local mitigates_rain = false		
 			
-
 			for k,v in pairs (self.inst.components.inventory.equipslots) do
 				if v.components.dapperness then
 					total_dapperness = total_dapperness + v.components.dapperness:GetDapperness(self.inst)
@@ -160,18 +180,17 @@ AddComponentPostInit("sanity",
 				end
 			end
 
-
 			local rain_delta = 0
 			if GetSeasonManager() and GetSeasonManager():IsRaining() and not mitigates_rain then
-				--Wurt suffers 50% less penalty from being wet
-				if GetPlayer().prefab == "wurt" then
-					rain_delta = 0.5*(-TUNING.DAPPERNESS_MED*1.5* GetSeasonManager():GetPrecipitationRate())		
-				else
-					rain_delta = -TUNING.DAPPERNESS_MED*1.5* GetSeasonManager():GetPrecipitationRate()
-				end
+				rain_delta = -TUNING.DAPPERNESS_MED*1.5* GetSeasonManager():GetPrecipitationRate()
 			end
 
-			self.rate = (dapper_delta + light_delta + aura_delta + rain_delta)	
+			--Wurt suffers 50% less penalty from being wet
+			if self.inst.prefab == "wurt" then
+				self.rate = (dapper_delta + light_delta + aura_delta + rain_delta)*0.5
+			else
+				self.rate = (dapper_delta + light_delta + aura_delta + rain_delta)	
+			end
 			
 			if self.custom_rate_fn then
 				self.rate = self.rate + self.custom_rate_fn(self.inst)
@@ -181,5 +200,6 @@ AddComponentPostInit("sanity",
 		end
 	end
 )
+
 
 
