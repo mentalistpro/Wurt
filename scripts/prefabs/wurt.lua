@@ -207,6 +207,38 @@ local function OnRespawn(inst)
     end
 end
 
+local function onPreEat(food)
+	if food and food.components.edible then       
+		if food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then            
+			if food.components.edible.healthvalue < 0 then
+				food.components.edible.healthvalue = 0 
+			end           
+			if food.components.edible.sanityvalue < 0 then
+				food.components.edible.sanityvalue = 0 
+			end       
+		end 
+	end
+end
+
+local function onEat(inst, food)    
+	if food and food.components.edible then        
+		local food_health = food.components.edible.healthvalue         
+		local food_hunger = food.components.edible.hungervalue       
+		local food_sanity = food.components.edible.sanityvalue     
+		
+		--Bonus stats from food items
+		if food.prefab == "durian" or food.prefab == "durian_cooked" then
+			inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.6		
+			inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.6	
+			inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.6		  		
+		elseif food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
+			inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.33		
+			inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.33		
+			inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.33		
+		end
+	end
+end
+
 local function mermbuilderfn(inst)
 	if GetPlayer() then
 		inst.components.sanity:DoDelta(5)
@@ -222,45 +254,31 @@ local function fishlover(inst, item)
 	--GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "FISH_LOVE"))            		
 end
 
-local function OnEat(inst, food)
-	if food.components.edible and food.components.edible.foodtype == "VEGGIE" then
-		inst.components.sanity:DoDelta(15)
-		inst.components.hunger:DoDelta(15)
-	end
-	if food.components.edible and food.components.edible.foodtype == "VEGGIE" then
-		inst.components.sanity:DoDelta(15)
-		inst.components.hunger:DoDelta(15)
-	end
-	if food.components.edible and food.components.edible.foodtype == "VEGGIE" then
-		inst.components.sanity:DoDelta(15)
-		inst.components.hunger:DoDelta(15)
-	end 
-end
+
 
 ------------------------------------------------------------------------------------------------
 
 local function fn(inst)
     inst:AddTag("playermerm")			--Wurt is a player, just a tag, no function.
-	inst:AddTag("marshwalker")			--Wurt walks on marsh turfs quickly, see IsMarshWalker in this file.
     inst:AddTag("merm")					--Wurt is a merm.
     inst:AddTag("mermbuilder")			--Wurt receives sanity when merm structure is built, different from DST due to Mermhouse Crafting mod, see IsMermBuilder in this file.
     inst:AddTag("mermfluent")			--Wurt is fluent in merm langugage, see Befriendable Merm mod.
     inst:AddTag("mermguard")			--Wurt is a merm guard, see Befriendable Merm mod.
     inst:AddTag("wet")					--Wurt is a wet entity.
     inst:AddTag("stronggrip")			--Wurt is immortal if boat sinks, see HasStrongGrip in this file.
-
-    inst:AddComponent("foodaffinity")
-    inst.components.foodaffinity:AddFoodtypeAffinity("VEGGIE", 1.33)
-    inst.components.foodaffinity:AddFoodtypeAffinity("ROUGHAGE", 1.33)
-    inst.components.foodaffinity:AddPrefabAffinity  ("kelp",          1.33)
-    inst.components.foodaffinity:AddPrefabAffinity  ("kelp_cooked",   1.33)
-    inst.components.foodaffinity:AddPrefabAffinity  ("kelp_dried",    1.33)
-    inst.components.foodaffinity:AddPrefabAffinity  ("durian",        1.6 )
-    inst.components.foodaffinity:AddPrefabAffinity  ("durian_cooked", 1.6 )
 	
-	
-	inst.components.eater:SetVegetarian()
-	inst.components.eater:SetOnEatFn(OnEat)
+	inst.components.eater.foodprefs = { "VEGGIE","SEEDS" }
+	inst.components.eater:SetOnEatFn(onEat)   
+	local self = inst.components.eater   
+	local old = self.Eat   
+	local crockfoods = require("preparedfoods")        
+	function self:Eat(food, force) -- rewriting the Eat event        
+		if crockfoods[food.prefab] then -- test if food is a crockpot food         
+			return old(self, food, force)       
+		end        
+		onPreEat(food)        
+		return old(self, food, force)    
+	end
 		
     inst:AddComponent("reader")
     inst.peruse_brimstone = peruse_brimstone
@@ -286,17 +304,17 @@ local function fn(inst)
         inst:DoTaskInTime(0, function() RoyalDowngrade(inst) end)
     end
 		
-	--[[local disguisehat_recipe = Recipe(
+	if IsDLCEnabled and IsDLCEnabled(3) then
+		local disguisehat_recipe = Recipe(
 		"disguisehat", 
 		{
 		Ingredient("twigs", 2), 
 		Ingredient("pigskin", 1), 
 		Ingredient("beardhair", 1)
 		}, 
-		RECIPETABS.DRESS, 
-		TECH.NONE, 
-		"common")
-		disguisehat_recipe.sortkey = 1]]
+		RECIPETABS.DRESS, TECH.NONE, "common", "")
+		disguisehat_recipe.sortkey = 1
+	end
 		
 	inst.OnSave = OnSave
     inst.OnPreLoad = OnPreLoad
