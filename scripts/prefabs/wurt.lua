@@ -246,12 +246,12 @@ local function mermbuilderfn(inst)
 	GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "BUILD_MERMSTRUCTURES"))            
 end
 
-local function fishlover(inst, item)
-	local item = inst.components.inventoryitem
-	if item and item:HasTag("fish") then
-		inst.components.sanity:DoDelta(TUNING.DAPPERNESS_MED)
-	end
-	--GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "FISH_LOVE"))            		
+local function fishlover(inst)
+	if inst.components.inventory:Has("fish",1) then
+		inst.components.sanity.dapperness = 100/(30*10*6)
+	else
+		inst.components.sanity.dapperness = 0
+	end        		
 end
 
 
@@ -288,9 +288,10 @@ local function fn(inst)
     inst.peruse_gardening = peruse_gardening
 	
 	inst.mermbuilderfn = mermbuilderfn
-    inst:ListenForEvent("gotnewitem", fishlover)
-    --inst:ListenForEvent("gotnewitem", fishpresever)
 
+    inst:ListenForEvent("itemget", function() fishlover(inst) end)
+    inst:ListenForEvent("itemlose", function() fishlover(inst) end)
+	
     inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
     inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())
 
