@@ -106,8 +106,6 @@ AddComponentPostInit("locomotor",
 
 local function isfish(inst)
 	inst:AddTag("fish")
-	inst:AddComponent("dapperness")
-	inst.components.dapperness.dapperness = TUNING.DAPPERNESS_MED
 end
 
 AddPrefabPostInit("eel", isfish)
