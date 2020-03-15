@@ -1,4 +1,4 @@
-version                     = "0.3" 
+version                     = "0.6" 
 name                        = "Wurt [DST]"
 description                 = "Wurt from DST"
 author                      = "mentalistpro"
