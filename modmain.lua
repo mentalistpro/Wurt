@@ -52,6 +52,8 @@ TUNING.WURT_SANITY_KINGBONUS = 200
 
 TUNING.WURT_FISH_PRESERVER_RATE = 1/4
 
+TUNING.WURT_QOL_BUFF = GetModConfigData("qol_buff")
+
 ------------------------------------------------------------------------------------------------
 --#3 Perks
 
@@ -60,6 +62,7 @@ local GetPlayer = _G.GetPlayer
 local GetSeasonManager = _G.GetSeasonManager
 local GetWorld = _G.GetWorld
 local GROUND = _G.GROUND
+local IsDLCEnabled = _G.IsDLCEnabled
 local RoadManager = _G.RoadManager
 local TheSim = _G.TheSim
 
@@ -71,9 +74,18 @@ AddComponentPostInit("locomotor",
     function(self)  
         function self:UpdateGroundSpeedMultiplier()         
             self.groundspeedmultiplier = 1
+            
             local ground = GetWorld()
-            local oncreep = ground ~= nil and ground.GroundCreep:OnCreep(self.inst.Transform:GetWorldPosition())
             local x,y,z = self.inst.Transform:GetWorldPosition()
+            local oncreep = ground ~= nil and ground.GroundCreep:OnCreep(self.inst.Transform:GetWorldPosition())
+            
+            if IsDLCEnabled and IsDLCEnabled(2) then
+                local onflood = ground ~= nil and ground.Flooding ~= nil and ground.Flooding:OnFlood(x, y, z)
+                local boating = self.inst.components.driver and self.inst.components.driver:GetIsDriving()
+                if onflood and not boating then
+                    self.groundspeedmultiplier = TUNING.FLOOD_SPEED_MULTIPLIER
+                end
+            end
             
             if oncreep then
                 if self.triggerscreep and not self.wasoncreep then
@@ -89,18 +101,20 @@ AddComponentPostInit("locomotor",
                 if self.fasteronroad then
                     if RoadManager and RoadManager:IsOnRoad( x,0,z ) then
                         self.groundspeedmultiplier = self.fastmultiplier
-                        
-                    --//Wurt's walk speed bonus on marsh turfs
+                    
                     elseif ground ~= nil then
                         local tile = ground.Map:GetTileAtPoint(x,0,z)
-                        local tile_is_marsh = tile == GROUND.MARSH or tile == GROUND.TIDALMARSH
-                        
-                        if tile and tile == GROUND.ROAD then
+                        if tile and ( tile == GROUND.ROAD or tile == GROUND.COBBLEROAD ) then
                             self.groundspeedmultiplier = self.fastmultiplier
-                        elseif tile and tile_is_marsh and self.inst.prefab == "wurt" then
-                            self.groundspeedmultiplier = self.fastmultiplier                    
                         end
-                    --//END
+                        
+                        --//Wurt's walk speed bonus on marsh turfs
+                        if tile and ( tile == GROUND.MARSH or tile == GROUND.TIDALMARSH ) then
+                            if self.inst.prefab == "wurt" then
+                                self.groundspeedmultiplier = self.fastmultiplier
+                            end
+                        end
+                        --//END
                     
                     end
                 end
@@ -122,7 +136,7 @@ AddComponentPostInit("sanity",
                 local m = self.inst.components.moisture
                 
                 --//Wurt suffers from 50% less wetness penalty
-                if self.inst.prefab == "wurt" then
+                if self.inst.prefab == "wurt" and TUNING.WURT_QOL_BUFF == 1 then
                     return easing.inSine(m:GetMoisture(), 0, TUNING.MOISTURE_SANITY_PENALTY_MAX / 2, m.moistureclamp.max)
                 else
                     return easing.inSine(m:GetMoisture(), 0, TUNING.MOISTURE_SANITY_PENALTY_MAX, m.moistureclamp.max)               
