@@ -273,8 +273,8 @@ local function OnPreLoad(inst, data)
 end
 
 local function fn(inst)
-	local minimap = inst.entity:AddMiniMapEntity()
-	minimap:SetIcon( "wurt.tex" )
+    local minimap = inst.entity:AddMiniMapEntity()
+    minimap:SetIcon( "wurt.tex" )
 
     --//Tags
     inst:AddTag("playermerm")   
@@ -308,11 +308,11 @@ local function fn(inst)
     inst.peruse_gardening = peruse_gardening
     
     --//Resistant to moisture
-	if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
-		inst:AddComponent("moisturelistener")
-		inst.components.moisturelistener.wetnessSpeed = 0.25
-		inst.components.moisturelistener.wetnessResistance = 0.5
-	end 
+    if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
+        inst:AddComponent("moisturelistener")
+        inst.components.moisturelistener.wetnessSpeed = 0.25
+        inst.components.moisturelistener.wetnessResistance = 0.5
+    end 
 
     --//Merm King
     if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
@@ -341,7 +341,11 @@ local function fn(inst)
     inst:ListenForEvent("locomote", EnableTentacleWarning)
     inst:ListenForEvent("itemget", FishLover)
     inst:ListenForEvent("itemlose", FishLover)
-    inst.mermbuilderfn = mermbuilderfn
+    if TUNING.WURT_QOL_BUFF == 1 then
+        inst.mermbuilderfn = mermbuilderfn
+		--inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
+        --inst:ListenForEvent("rainstop", function(inst)  inst.components.locomotor.walkspeed = 6 end)
+    end
 
     inst.OnSave = OnSave
     inst.OnPreLoad = OnPreLoad

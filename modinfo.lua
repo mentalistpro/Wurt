@@ -16,4 +16,13 @@ icon                        = "modicon.tex"
 
 configuration_options       =
 {
+	{
+	name = "qol_buff",
+	label = "QoL Buff?",
+	options =	{
+				{description = "No", data = 0},
+				{description = "Yes", data = 1},
+				},
+	default = 0,
+	},
 }
