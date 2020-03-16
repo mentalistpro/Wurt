@@ -273,6 +273,9 @@ local function OnPreLoad(inst, data)
 end
 
 local function fn(inst)
+	local minimap = inst.entity:AddMiniMapEntity()
+	minimap:SetIcon( "wurt.tex" )
+
     --//Tags
     inst:AddTag("playermerm")   
     inst:AddTag("merm")         --merms are neutral
