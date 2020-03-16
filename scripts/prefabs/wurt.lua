@@ -305,9 +305,11 @@ local function fn(inst)
     inst.peruse_gardening = peruse_gardening
     
     --//Resistant to moisture
-    inst:AddComponent("moisturelistener")
-    inst.components.moisturelistener.wetnessSpeed = 0.25
-    inst.components.moisturelistener.wetnessResistance = 0.5
+	if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
+		inst:AddComponent("moisturelistener")
+		inst.components.moisturelistener.wetnessSpeed = 0.25
+		inst.components.moisturelistener.wetnessResistance = 0.5
+	end 
 
     --//Merm King
     if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
