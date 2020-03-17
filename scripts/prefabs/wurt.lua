@@ -220,6 +220,19 @@ end
 ------------------------------------------------------------------------------------------------
 --#5 Other perks
 
+local function EnableSpeedBoost(inst)
+    local ground = GetWorld()   
+    local x,y,z = inst.Transform:GetWorldPosition()
+    local tile = ground.Map:GetTileAtPoint(x,0,z)   
+    if tile and ( tile == GROUND.MARSH or tile == GROUND.TIDALMARSH ) then
+        inst.components.locomotor.groundspeedmultiplier = 1.3
+    end 
+end
+
+local function UpdateSpeedBoost(inst)
+	inst:ListenForEvent("locomote", EnableSpeedBoost)
+end
+
 local function FishLover(inst)
     local isfish =  inst.components.inventory:Has("fish",1) or 
                     inst.components.inventory:Has("tropical_fish",1) or 
@@ -308,6 +321,8 @@ local function fn(inst)
     inst.peruse_gardening = peruse_gardening
     
     --//Resistant to moisture
+	TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
+	
     if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
         inst:AddComponent("moisturelistener")
         inst.components.moisturelistener.wetnessSpeed = 0.25
@@ -322,28 +337,20 @@ local function fn(inst)
     end
     inst:ListenForEvent("onmermkingcreated", RoyalUpgrade, GetWorld())
     inst:ListenForEvent("onmermkingdestroyed", RoyalDowngrade, GetWorld())
-    
-    --//Hamlet Mask
-    if IsDLCEnabled and IsDLCEnabled(3) then
-        local disguisehat_recipe = Recipe(
-        "disguisehat", 
-        {
-        Ingredient("twigs", 2), 
-        Ingredient("pigskin", 1), 
-        Ingredient("beardhair", 1)
-        }, 
-        RECIPETABS.DRESS, TECH.NONE, "common", "")
-        disguisehat_recipe.sortkey = 1
-    end
-    
+        
     --//Other perks
+    inst:DoTaskInTime(0.1, EnableSpeedBoost)
+    inst:DoTaskInTime(0.1, UpdateSpeedBoost)
+	
     inst._active_warnings = {}
     inst:ListenForEvent("locomote", EnableTentacleWarning)
+	
     inst:ListenForEvent("itemget", FishLover)
     inst:ListenForEvent("itemlose", FishLover)
+	
     if TUNING.WURT_QOL_BUFF == 1 then
         inst.mermbuilderfn = mermbuilderfn
-		--inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
+        --inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
         --inst:ListenForEvent("rainstop", function(inst)  inst.components.locomotor.walkspeed = 6 end)
     end
 
