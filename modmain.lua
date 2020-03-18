@@ -57,8 +57,9 @@ TUNING.WURT_QOL_BUFF = GetModConfigData("qol_buff")
 ------------------------------------------------------------------------------------------------
 --#3 Perks
 
---//Fish Preserver
+--Fish Preserver
 local GetPlayer = _G.GetPlayer
+
 local function FishPreserver(inst, holder)
     local holder = GetPlayer()
     if holder.prefab == "wurt" then
@@ -70,4 +71,15 @@ AddPrefabPostInit("eel", FishPreserver)
 AddPrefabPostInit("fish", FishPreserver)
 AddPrefabPostInit("tropical_fish", FishPreserver)
 
-
+--Pig King does not accept Wurt's tributes unless Wurt is not a merm
+	
+AddPrefabPostInit("pigking", 
+	function(inst)
+		inst.components.trader:SetAcceptTest(
+			function(inst, item, giver)
+				local giver = GetPlayer()
+				return item.components.tradable.goldvalue > 0 and not giver:HasTag("merm")
+			end
+		)
+	end
+)
