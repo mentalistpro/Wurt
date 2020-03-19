@@ -32,7 +32,6 @@ local start_inv =
 --#1 Character Stats
 
 local function UpdateStats(inst, maxhealth, maxhunger, maxsanity)
-
     local current_health = inst.health_percent or inst.components.health:GetPercent()
     inst.health_percent = nil
 
@@ -230,7 +229,7 @@ local function EnableSpeedBoost(inst)
 end
 
 local function UpdateSpeedBoost(inst)
-	inst:ListenForEvent("locomote", EnableSpeedBoost)
+    inst:ListenForEvent("locomote", EnableSpeedBoost)
 end
 
 local function FishLover(inst)
@@ -299,7 +298,7 @@ local function fn(inst)
     inst:AddTag("stronggrip")   
     
     --//Eating
-    inst.components.eater.foodprefs = { "VEGGIE","SEEDS" }
+    inst.components.eater.foodprefs = { "VEGGIE","SEEDS", "HONEY" }
     inst.components.eater:SetOnEatFn(onEat)   
     local self = inst.components.eater   
     local old = self.Eat   
@@ -321,8 +320,8 @@ local function fn(inst)
     inst.peruse_gardening = peruse_gardening
     
     --//Resistant to moisture
-	TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
-	
+    TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
+    
     if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
         inst:AddComponent("moisturelistener")
         inst.components.moisturelistener.wetnessSpeed = 0.25
@@ -341,13 +340,13 @@ local function fn(inst)
     --//Other perks
     inst:DoTaskInTime(0.1, EnableSpeedBoost)
     inst:DoTaskInTime(0.1, UpdateSpeedBoost)
-	
+    
     inst._active_warnings = {}
     inst:ListenForEvent("locomote", EnableTentacleWarning)
-	
+    
     inst:ListenForEvent("itemget", FishLover)
     inst:ListenForEvent("itemlose", FishLover)
-	
+    
     if TUNING.WURT_QOL_BUFF == 1 then
         inst.mermbuilderfn = mermbuilderfn
         --inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
