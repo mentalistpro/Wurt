@@ -1,10 +1,10 @@
-version                     = "0.8" 
-name                        = "Wurt [DST]"
-description                 = "Wurt from DST"
+version                     = "1.0" 
+name                        = "Wurt"
+description                 = "Wurt, ported from DST, a young female merm."
 author                      = "mentalistpro"
 forumthread                 = " "
 api_version                 = 6
-priority                    = -1
+priority                    = -2        --load after Clever Disguise and Mermhouse Crafting
 
 dont_starve_compatible      = true
 shipwrecked_compatible      = true
@@ -16,13 +16,13 @@ icon                        = "modicon.tex"
 
 configuration_options       =
 {
-	{
-	name = "qol_buff",
-	label = "QoL Buff?",
-	options =	{
-				{description = "No", data = 0},
-				{description = "Yes", data = 1},
-				},
-	default = 0,
-	},
+    {
+    name = "qol_buff",
+    label = "QoL Buff?",
+    options =   {
+                {description = "No", data = 0},
+                {description = "Yes", data = 1},
+                },
+    default = 0,
+    },
 }
