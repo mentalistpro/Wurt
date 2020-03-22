@@ -1,4 +1,4 @@
-version                     = "1.1" 
+version                     = "1.0.1" 
 name                        = "Wurt"
 description                 = "Wurt, ported from DST, a young female merm."
 author                      = "mentalistpro"

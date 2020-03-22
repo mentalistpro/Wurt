@@ -298,7 +298,8 @@ local function fn(inst)
     inst:AddTag("stronggrip")   
     
     --//Eating
-    inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY" }
+    inst.components.eater.ablefoods = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
+    inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
     inst.components.eater:SetOnEatFn(onEat)   
     local self = inst.components.eater   
     local old = self.Eat   
