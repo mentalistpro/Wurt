@@ -7,8 +7,8 @@ PrefabFiles =
 Assets =
 {
     Asset("ATLAS", "bigportraits/wurt.xml"),
-    Asset("ATLAS", "images/inventoryimages/turf_marsh.xml"),
-    Asset("ATLAS", "images/inventoryimages/turf_tidalmarsh.xml"),
+    --Asset("ATLAS", "images/inventoryimages/turf_marsh.xml"),
+    --Asset("ATLAS", "images/inventoryimages/turf_tidalmarsh.xml"),
     Asset("ATLAS", "images/saveslot_portraits/wurt.xml"),
     Asset("ATLAS", "images/selectscreen_portraits/wurt.xml"),
     Asset("ATLAS", "minimap/wurt.xml")
@@ -60,8 +60,6 @@ TUNING.WURT_QOL_BUFF = GetModConfigData("qol_buff")
 ------------------------------------------------------------------------------------------------
 --#3 Recipes/Strings
 
---Marsh turf
-
 local Ingredient = _G.Ingredient
 local IsDLCEnabled = _G.IsDLCEnabled 
 local Recipe = _G.Recipe
@@ -69,18 +67,17 @@ local RECIPETABS = _G.RECIPETABS
 local RECIPE_GAME_TYPE = _G.RECIPE_GAME_TYPE
 local TECH = _G.TECH
 
-local turf_marsh = Recipe(
-    "turf_marsh", 
-    {
-    Ingredient("cutreeds", 1), 
-    Ingredient("spoiled_food", 2),
-    },
-    RECIPETABS.TOWN, TECH.SCIENCE_TWO)
-    
-    turf_marsh.atlas = "images/inventoryimages/turf_marsh.xml"
-    if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) then
-        turf_marsh.game_type = "common"
-    end
+--Marsh turf
+
+if IsDLCEnabled and ( IsDLCEnabled(2) or IsDLCEnabled(3) ) then
+    local turf_marsh = Recipe(
+        "turf_marsh", 
+        {
+            Ingredient("cutreeds", 1), 
+            Ingredient("spoiled_food", 2),
+        },
+        RECIPETABS.TOWN, TECH.SCIENCE_TWO)  
+end
     
 _S.NAMES.TURF_MARSH = "Marsh Turf"
 _S.RECIPE_DESC.TURF_MARSH = "Home is where the marsh is."
@@ -111,14 +108,13 @@ _S.CHARACTERS.WX78.DESCRIBE.TURF_MARSH = {"THE GROUND"}
 local turf_tidalmarsh = Recipe(
     "turf_tidalmarsh", 
     {
-    Ingredient("cutreeds", 1), 
-    Ingredient("spoiled_food", 2),
+        Ingredient("cutreeds", 1), 
+        Ingredient("spoiled_food", 2),
     },
     RECIPETABS.TOWN, TECH.SCIENCE_TWO)
     
-    turf_tidalmarsh.atlas = "images/inventoryimages/turf_tidalmarsh.xml"
     if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) then
-        turf_tidalmarsh.game_type = {"shipwrecked", "porkland"}
+        turf_tidalmarsh.game_type = "common"
     end
     
 _S.NAMES.TURF_TIDALMARSH = "Tidal Marsh Turf"
@@ -175,5 +171,4 @@ AddPrefabPostInit("pigking",
         )
     end
 )
-
 
