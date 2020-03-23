@@ -7,8 +7,6 @@ PrefabFiles =
 Assets =
 {
     Asset("ATLAS", "bigportraits/wurt.xml"),
-    --Asset("ATLAS", "images/inventoryimages/turf_marsh.xml"),
-    --Asset("ATLAS", "images/inventoryimages/turf_tidalmarsh.xml"),
     Asset("ATLAS", "images/saveslot_portraits/wurt.xml"),
     Asset("ATLAS", "images/selectscreen_portraits/wurt.xml"),
     Asset("ATLAS", "minimap/wurt.xml")
@@ -104,43 +102,39 @@ _S.CHARACTERS.WURT.DESCRIBE.TURF_MARSH = {"Ground bit."}
 _S.CHARACTERS.WX78.DESCRIBE.TURF_MARSH = {"THE GROUND"}
 
 --Tidal marsh turf
+if IsDLCEnabled and ( IsDLCEnabled(2) or IsDLCEnabled(3) ) then
+    local turf_tidalmarsh = Recipe(
+        "turf_tidalmarsh", 
+        {
+            Ingredient("cutreeds", 1), 
+            Ingredient("spoiled_food", 2),
+        },
+        RECIPETABS.TOWN, TECH.SCIENCE_TWO, "common")
+            
+    _S.NAMES.TURF_TIDALMARSH = "Tidal Marsh Turf"
+    _S.RECIPE_DESC.TURF_TIDALMARSH = "Sea is where home used to be."
 
-local turf_tidalmarsh = Recipe(
-    "turf_tidalmarsh", 
-    {
-        Ingredient("cutreeds", 1), 
-        Ingredient("spoiled_food", 2),
-    },
-    RECIPETABS.TOWN, TECH.SCIENCE_TWO)
-    
-    if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) then
-        turf_tidalmarsh.game_type = "common"
-    end
-    
-_S.NAMES.TURF_TIDALMARSH = "Tidal Marsh Turf"
-_S.RECIPE_DESC.TURF_TIDALMARSH = "Sea is where home used to be."
-
-_S.CHARACTERS.GENERIC.DESCRIBE.TURF_TIDALMARSH = {"A chunk of ground."}
-_S.CHARACTERS.WAGSTAFF.DESCRIBE.TURF_TIDALMARSH = {"A spongy consistency."}
-_S.CHARACTERS.WALANI.DESCRIBE.TURF_TIDALMARSH = {"Goopy..."}
-_S.CHARACTERS.WARLY.DESCRIBE.TURF_TIDALMARSH = {"It's like an ingredient for the ground."}
-_S.CHARACTERS.WATHGRITHR.DESCRIBE.TURF_TIDALMARSH = {"A piece รถf the battlefield."}
-_S.CHARACTERS.WAXWELL.DESCRIBE.TURF_TIDALMARSH = {"What is that little creature up to?"}
-_S.CHARACTERS.WEBBER.DESCRIBE.TURF_TIDALMARSH = {"Some pretty average earth."}
-_S.CHARACTERS.WENDY.DESCRIBE.TURF_TIDALMARSH = {"Some ground."}
-_S.CHARACTERS.WHEELER.DESCRIBE.TURF_TIDALMARSH = {"Do I really need to drag this dirt around with me?"}
-_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.TURF_TIDALMARSH = {"The ground. You step on it."}
-_S.CHARACTERS.WILBA.DESCRIBE.TURF_TIDALMARSH = {"'TIS ALL FWOOSHED"}
-_S.CHARACTERS.WILLOW.DESCRIBE.TURF_TIDALMARSH = {"The ground is boring."}
-_S.CHARACTERS.WINONA.DESCRIBE.TURF_TIDALMARSH = {"That's a chunk of squishy ground."}
-_S.CHARACTERS.WOLFGANG.DESCRIBE.TURF_TIDALMARSH = {"Step stones."}
-_S.CHARACTERS.WOODIE.DESCRIBE.TURF_TIDALMARSH = {"Just some ground, eh?"}
-_S.CHARACTERS.WOODLEGS.DESCRIBE.TURF_TIDALMARSH = {"Me ain't no ground lubber."}
-_S.CHARACTERS.WORMWOOD.DESCRIBE.TURF_TIDALMARSH = {"Squishy"}
-_S.CHARACTERS.WORTOX.DESCRIBE.TURF_TIDALMARSH = {"Floor or ceiling, depending on your perspective."}
-_S.CHARACTERS.WURT.DESCRIBE.TURF_TIDALMARSH = {"Ground bit."}
-_S.CHARACTERS.WX78.DESCRIBE.TURF_TIDALMARSH = {"THE GROUND"}
-    
+    _S.CHARACTERS.GENERIC.DESCRIBE.TURF_TIDALMARSH = {"A chunk of ground."}
+    _S.CHARACTERS.WAGSTAFF.DESCRIBE.TURF_TIDALMARSH = {"A spongy consistency."}
+    _S.CHARACTERS.WALANI.DESCRIBE.TURF_TIDALMARSH = {"Goopy..."}
+    _S.CHARACTERS.WARLY.DESCRIBE.TURF_TIDALMARSH = {"It's like an ingredient for the ground."}
+    _S.CHARACTERS.WATHGRITHR.DESCRIBE.TURF_TIDALMARSH = {"A piece รถf the battlefield."}
+    _S.CHARACTERS.WAXWELL.DESCRIBE.TURF_TIDALMARSH = {"What is that little creature up to?"}
+    _S.CHARACTERS.WEBBER.DESCRIBE.TURF_TIDALMARSH = {"Some pretty average earth."}
+    _S.CHARACTERS.WENDY.DESCRIBE.TURF_TIDALMARSH = {"Some ground."}
+    _S.CHARACTERS.WHEELER.DESCRIBE.TURF_TIDALMARSH = {"Do I really need to drag this dirt around with me?"}
+    _S.CHARACTERS.WICKERBOTTOM.DESCRIBE.TURF_TIDALMARSH = {"The ground. You step on it."}
+    _S.CHARACTERS.WILBA.DESCRIBE.TURF_TIDALMARSH = {"'TIS ALL FWOOSHED"}
+    _S.CHARACTERS.WILLOW.DESCRIBE.TURF_TIDALMARSH = {"The ground is boring."}
+    _S.CHARACTERS.WINONA.DESCRIBE.TURF_TIDALMARSH = {"That's a chunk of squishy ground."}
+    _S.CHARACTERS.WOLFGANG.DESCRIBE.TURF_TIDALMARSH = {"Step stones."}
+    _S.CHARACTERS.WOODIE.DESCRIBE.TURF_TIDALMARSH = {"Just some ground, eh?"}
+    _S.CHARACTERS.WOODLEGS.DESCRIBE.TURF_TIDALMARSH = {"Me ain't no ground lubber."}
+    _S.CHARACTERS.WORMWOOD.DESCRIBE.TURF_TIDALMARSH = {"Squishy"}
+    _S.CHARACTERS.WORTOX.DESCRIBE.TURF_TIDALMARSH = {"Floor or ceiling, depending on your perspective."}
+    _S.CHARACTERS.WURT.DESCRIBE.TURF_TIDALMARSH = {"Ground bit."}
+    _S.CHARACTERS.WX78.DESCRIBE.TURF_TIDALMARSH = {"THE GROUND"}
+end
 
 ------------------------------------------------------------------------------------------------
 --#4 Perks
