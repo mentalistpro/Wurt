@@ -9,7 +9,8 @@ Assets =
     Asset("ATLAS", "bigportraits/wurt.xml"),
     Asset("ATLAS", "images/saveslot_portraits/wurt.xml"),
     Asset("ATLAS", "images/selectscreen_portraits/wurt.xml"),
-    Asset("ATLAS", "minimap/wurt.xml")
+    Asset("ATLAS", "minimap/wurt.xml"),
+    Asset("SOUND", "sound/wurt.fsb"),
 }
 
 AddMinimapAtlas("minimap/wurt.xml")
