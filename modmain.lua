@@ -10,7 +10,6 @@ Assets =
     Asset("ATLAS", "images/saveslot_portraits/wurt.xml"),
     Asset("ATLAS", "images/selectscreen_portraits/wurt.xml"),
     Asset("ATLAS", "minimap/wurt.xml"),
-    Asset("SOUND", "sound/wurt.fsb"),
 }
 
 AddMinimapAtlas("minimap/wurt.xml")
@@ -77,7 +76,22 @@ if IsDLCEnabled and ( IsDLCEnabled(2) or IsDLCEnabled(3) ) then
         },
         RECIPETABS.TOWN, TECH.SCIENCE_TWO)  
 end
-    
+
+local _S = _G.STRINGS
+
+if _S.CHARACTERS.WALANI     == nil then _S.CHARACTERS.WALANI        = { DESCRIBE = {},} end -- DLC002
+if _S.CHARACTERS.WARBUCKS   == nil then _S.CHARACTERS.WARBUCKS      = { DESCRIBE = {},} end -- DLC003
+if _S.CHARACTERS.WARLY      == nil then _S.CHARACTERS.WARLY         = { DESCRIBE = {},} end -- DLC002
+if _S.CHARACTERS.WATHGRITHR == nil then _S.CHARACTERS.WATHGRITHR    = { DESCRIBE = {},} end -- DLC001
+if _S.CHARACTERS.WEBBER     == nil then _S.CHARACTERS.WEBBER        = { DESCRIBE = {},} end -- DLC001
+if _S.CHARACTERS.WHEELER    == nil then _S.CHARACTERS.WHEELER       = { DESCRIBE = {},} end -- DLC003
+if _S.CHARACTERS.WILBA      == nil then _S.CHARACTERS.WILBA         = { DESCRIBE = {},} end -- DLC003
+if _S.CHARACTERS.WINONA     == nil then _S.CHARACTERS.WINONA        = { DESCRIBE = {},} end -- DST
+if _S.CHARACTERS.WOODLEGS   == nil then _S.CHARACTERS.WOODLEGS      = { DESCRIBE = {},} end -- DLC002
+if _S.CHARACTERS.WORMWOOD   == nil then _S.CHARACTERS.WORMWOOD      = { DESCRIBE = {},} end -- DLC003
+if _S.CHARACTERS.WORTOX     == nil then _S.CHARACTERS.WORTOX        = { DESCRIBE = {},} end -- DST
+if _S.CHARACTERS.WURT       == nil then _S.CHARACTERS.WURT          = { DESCRIBE = {},} end -- DST
+
 _S.NAMES.TURF_MARSH = "Marsh Turf"
 _S.RECIPE_DESC.TURF_MARSH = "Home is where the marsh is."
 
