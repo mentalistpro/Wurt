@@ -27,8 +27,8 @@ configuration_options       =
     },
 
     {
-    name = "love_fish",
-    label = "Love fish",
+    name = "love_veggie",
+    label = "Love veggie",
     options =   {
                 {description = "YES", data = 0},
                 {description = "NO", data = 1},

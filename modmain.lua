@@ -1,4 +1,4 @@
-PrefabFiles = 
+PrefabFiles =
 {
     "wurt",
     "wurt_tentacle_warning"
@@ -19,8 +19,7 @@ AddMinimapAtlas("minimap/wurt.xml")
 --[[CONTENT]]
 --#1 AddModCharacter
 --#2 Tuning
---#3 Recipes/Strings
---#4 Perks
+--#3 Perks
 
 ------------------------------------------------------------------------------------------------
 --#1 AddModCharacter
@@ -53,28 +52,40 @@ TUNING.WURT_SANITY_KINGBONUS = 200
 
 TUNING.WURT_FISH_PRESERVER_RATE = 1/4
 
-TUNING.WURT_QOL_BUFF = GetModConfigData("qol_buff")
+TUNING.WURT_LOVES_RAIN = GetModConfigData("love_rain")
+TUNING.WURT_LOVES_WET = GetModConfigData("less_wetness")
+TUNING.WURT_LOVES_BUILDINGS = GetModConfigData("love_building")
+TUNING.WURT_LOVES_VEGGIES = GetModConfigData("love_veggie")
+TUNING.WURT_NO_DROWNING = GetModConfigData("no_drowning")
 
 ------------------------------------------------------------------------------------------------
---#4 Perks
+--#3 Perks
 
 --Fish Preserver
-local GetPlayer = _G.GetPlayer
-
-local function FishPreserver(inst, holder)
-    local holder = GetPlayer()
-    if holder.prefab == "wurt" then
-        inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST*4)
-    end
+local function EnableFishPreserver(inst, holder)
+    local holder = _G.GetPlayer()
+	if holder.prefab == "wurt" then
+		inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST*4)
+	else
+		inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST)
+	end
 end
 
-AddPrefabPostInit("eel", FishPreserver)
-AddPrefabPostInit("fish", FishPreserver)
-AddPrefabPostInit("tropical_fish", FishPreserver)
+local function DisableFishPreserver(inst, holder)
+	inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST)
+end
+
+local function UpdateFishPreserver(inst)
+    inst:ListenForEvent("itemget", EnableFishPreserver)
+    inst:ListenForEvent("itemlose", DisableFishPreserver)
+end
+
+AddPrefabPostInit("eel", UpdateFishPreserver)
+AddPrefabPostInit("fish", UpdateFishPreserver)
+AddPrefabPostInit("tropical_fish", UpdateFishPreserver)
 
 --Pig King does not accept Wurt's tributes unless Wurt is not a merm
-    
-AddPrefabPostInit("pigking", 
+AddPrefabPostInit("pigking",
     function(inst)
         inst.components.trader:SetAcceptTest(
             function(inst, item, giver)

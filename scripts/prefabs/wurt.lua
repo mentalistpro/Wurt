@@ -55,7 +55,7 @@ local function RoyalUpgrade(inst, silent)
 
     if not silent and not inst.royal then
         inst.royal = true
-        inst.components.talker:Say(GetString(inst, "ANNOUNCE_KINGCREATED"))        
+        inst.components.talker:Say(GetString(inst, "ANNOUNCE_KINGCREATED"))
         inst.sg:PushEvent("powerup_wurt")
         inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/transform_to")
     end
@@ -76,33 +76,33 @@ end
 --#2 Eating Stats
 
 local function onPreEat(food)
-    if food and food.components.edible then       
-        if food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then            
+    if food and food.components.edible then
+        if food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
             if food.components.edible.healthvalue < 0 then
-                food.components.edible.healthvalue = 0 
-            end           
+                food.components.edible.healthvalue = 0
+            end
             if food.components.edible.sanityvalue < 0 then
-                food.components.edible.sanityvalue = 0 
-            end       
-        end 
+                food.components.edible.sanityvalue = 0
+            end
+        end
     end
 end
 
-local function onEat(inst, food)    
-    if food and food.components.edible then        
-        local food_health = food.components.edible.healthvalue        
+local function onEat(inst, food)
+    if food and food.components.edible then
+        local food_health = food.components.edible.healthvalue
         local food_hunger = food.components.edible.hungervalue
         local food_sanity = food.components.edible.sanityvalue
-        
+
         --Wurt receives bonus food stats (need tweak?)
         if food.prefab == "durian" or food.prefab == "durian_cooked" then
-            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.6     
-            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.6  
-            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.6              
+            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.6
+            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.6
+            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.6
         elseif food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
-            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.33        
-            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.33     
-            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.33     
+            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.33
+            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.33
+            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.33
         end
     end
 end
@@ -185,7 +185,7 @@ local function UpdateTentacleWarnings(inst)
                 ErodeAway(w, 0.5)
             end
         end
-    
+
     elseif next(inst._active_warnings) ~= nil then
         for t, w in pairs(inst._active_warnings) do
             if w:IsValid() then
@@ -201,7 +201,7 @@ local function DisableTentacleWarning(inst)
         inst.tentacle_warning_task:Cancel()
         inst.tentacle_warning_task = nil
     end
-            
+
     for t, w in pairs(inst._active_warnings) do
         if w:IsValid() then
             w:Remove()
@@ -220,12 +220,12 @@ end
 --#5 Other perks
 
 local function EnableSpeedBoost(inst)
-    local ground = GetWorld()   
+    local ground = GetWorld()
     local x,y,z = inst.Transform:GetWorldPosition()
-    local tile = ground.Map:GetTileAtPoint(x,0,z)   
+    local tile = ground.Map:GetTileAtPoint(x,0,z)
     if tile and ( tile == GROUND.MARSH or tile == GROUND.TIDALMARSH ) then
         inst.components.locomotor.groundspeedmultiplier = 1.3
-    end 
+    end
 end
 
 local function UpdateSpeedBoost(inst)
@@ -233,15 +233,15 @@ local function UpdateSpeedBoost(inst)
 end
 
 local function FishLover(inst)
-    local isfish =  inst.components.inventory:Has("fish",1) or 
-                    inst.components.inventory:Has("tropical_fish",1) or 
-                    inst.components.inventory:Has("eel",1)                  
-                    
-    local notfish = inst.components.inventory:Has("fish_raw_small",1) or 
-                    inst.components.inventory:Has("fish_raw_small_cooked",1) or 
-                    inst.components.inventory:Has("fish_cooked",1) or 
-                    inst.components.inventory:Has("fishsticks",1) or 
-                    inst.components.inventory:Has("fishtacos",1)    
+    local isfish =  inst.components.inventory:Has("fish",1) or
+                    inst.components.inventory:Has("tropical_fish",1) or
+                    inst.components.inventory:Has("eel",1)
+
+    local notfish = inst.components.inventory:Has("fish_raw_small",1) or
+                    inst.components.inventory:Has("fish_raw_small_cooked",1) or
+                    inst.components.inventory:Has("fish_cooked",1) or
+                    inst.components.inventory:Has("fishsticks",1) or
+                    inst.components.inventory:Has("fishtacos",1)
 
     if isfish then
         inst.components.sanity.dapperness = 100/(30*10*6)
@@ -249,14 +249,14 @@ local function FishLover(inst)
         inst.components.sanity.dapperness = -100/(30*10*6)
     else
         inst.components.sanity.dapperness = 0
-    end             
+    end
 end
 
 local function mermbuilderfn(inst)
     if GetPlayer() then
         inst.components.sanity:DoDelta(5)
     end
-    GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "BUILD_MERMSTRUCTURES"))            
+    GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "BUILD_MERMSTRUCTURES"))
 end
 
 ------------------------------------------------------------------------------------------------
@@ -289,29 +289,29 @@ local function fn(inst)
     minimap:SetIcon( "wurt.tex" )
 
     --//Tags
-    inst:AddTag("playermerm")   
+    inst:AddTag("playermerm")
     inst:AddTag("merm")         --merms are neutral
     inst:AddTag("mermbuilder")  --gain sanity by building merm structures
     inst:AddTag("mermfluent")   --read merm quotes
     inst:AddTag("mermguard")    --befriend with mermguards
-    inst:AddTag("wet")          
-    inst:AddTag("stronggrip")   
-    
+    inst:AddTag("wet")
+    inst:AddTag("stronggrip")
+
     --//Eating
     inst.components.eater.ablefoods = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
     inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
-    inst.components.eater:SetOnEatFn(onEat)   
-    local self = inst.components.eater   
-    local old = self.Eat   
-    local crockfoods = require("preparedfoods")        
-    function self:Eat(food, force) -- rewriting the Eat event        
-        if crockfoods[food.prefab] then -- test if food is a crockpot food         
-            return old(self, food, force)       
-        end        
-        onPreEat(food)        
-        return old(self, food, force)    
+    inst.components.eater:SetOnEatFn(onEat)
+    local self = inst.components.eater
+    local old = self.Eat
+    local crockfoods = require("preparedfoods")
+    function self:Eat(food, force) -- rewriting the Eat event
+        if crockfoods[food.prefab] then -- test if food is a crockpot food
+            return old(self, food, force)
+        end
+        onPreEat(food)
+        return old(self, food, force)
     end
-    
+
     --//Reading
     inst:AddComponent("reader")
     inst.peruse_brimstone = peruse_brimstone
@@ -319,15 +319,15 @@ local function fn(inst)
     inst.peruse_tentacles = peruse_tentacles
     inst.peruse_sleep = peruse_sleep
     inst.peruse_gardening = peruse_gardening
-    
+
     --//Resistant to moisture
     TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
-    
+
     if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
         inst:AddComponent("moisturelistener")
         inst.components.moisturelistener.wetnessSpeed = 0.25
         inst.components.moisturelistener.wetnessResistance = 0.5
-    end 
+    end
 
     --//Merm King
     if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
@@ -337,18 +337,18 @@ local function fn(inst)
     end
     inst:ListenForEvent("onmermkingcreated", RoyalUpgrade, GetWorld())
     inst:ListenForEvent("onmermkingdestroyed", RoyalDowngrade, GetWorld())
-        
+
     --//Other perks
     inst:DoTaskInTime(0.1, EnableSpeedBoost)
     inst:DoTaskInTime(0.1, UpdateSpeedBoost)
-    
+
     inst._active_warnings = {}
     inst:ListenForEvent("locomote", EnableTentacleWarning)
-    
+
     inst:ListenForEvent("itemget", FishLover)
     inst:ListenForEvent("itemlose", FishLover)
-    
-    if TUNING.WURT_QOL_BUFF == 1 then
+
+    if TUNING.WURT_LOVE_BUILDING == 1 then
         inst.mermbuilderfn = mermbuilderfn
         --inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
         --inst:ListenForEvent("rainstop", function(inst)  inst.components.locomotor.walkspeed = 6 end)
