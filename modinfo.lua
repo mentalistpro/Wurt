@@ -47,16 +47,6 @@ configuration_options       =
     },
 
     {
-    name = "less_wetness",
-    label = "Less wetness",
-    options =   {
-                {description = "YES", data = 0},
-                {description = "NO", data = 1},
-                },
-    default = 1,
-    },
-
-    {
     name = "no_drowning",
     label = "No drowning",
     options =   {

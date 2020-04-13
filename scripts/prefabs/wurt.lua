@@ -18,18 +18,19 @@ local start_inv =
     "disguisehat"
 }
 
-------------------------------------------------------------------------------------------------
+-----------------------------------------------------------
 
 --[[CONTENT]]
---#1 Character Stats
---#2 Eating Stats
---#3 Reading Stats
---#4 Tentacle Warning
---#5 Other perks
---#6 fn()
+--#1 Stats
+--#2 Xray
+--#3 Read
+--#4 Eat
+--#5 Perks
+--#6 Save/Load
+--#7 Wurt
 
-------------------------------------------------------------------------------------------------
---#1 Character Stats
+-----------------------------------------------------------
+--#1 Stats
 
 local function UpdateStats(inst, maxhealth, maxhunger, maxsanity)
     local current_health = inst.health_percent or inst.components.health:GetPercent()
@@ -72,62 +73,8 @@ local function RoyalDowngrade(inst, silent)
     end
 end
 
-------------------------------------------------------------------------------------------------
---#2 Eating Stats
-
-local function onPreEat(food)
-    if food and food.components.edible then
-        if food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
-            if food.components.edible.healthvalue < 0 then
-                food.components.edible.healthvalue = 0
-            end
-            if food.components.edible.sanityvalue < 0 then
-                food.components.edible.sanityvalue = 0
-            end
-        end
-    end
-end
-
-local function onEat(inst, food)
-    if food and food.components.edible then
-        local food_health = food.components.edible.healthvalue
-        local food_hunger = food.components.edible.hungervalue
-        local food_sanity = food.components.edible.sanityvalue
-
-        --Wurt receives bonus food stats (need tweak?)
-        if food.prefab == "durian" or food.prefab == "durian_cooked" then
-            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.6
-            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.6
-            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.6
-        elseif food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
-            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.33
-            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.33
-            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.33
-        end
-    end
-end
-
-------------------------------------------------------------------------------------------------
---#3 Reading Stats
-
-local function peruse_brimstone(inst)
-    inst.components.sanity:DoDelta(-TUNING.SANITY_LARGE)
-end
-local function peruse_birds(inst)
-    inst.components.sanity:DoDelta(TUNING.SANITY_HUGE)
-end
-local function peruse_tentacles(inst)
-    inst.components.sanity:DoDelta(TUNING.SANITY_HUGE)
-end
-local function peruse_sleep(inst)
-    inst.components.sanity:DoDelta(TUNING.SANITY_LARGE)
-end
-local function peruse_gardening(inst)
-    inst.components.sanity:DoDelta(-TUNING.SANITY_LARGE)
-end
-
-------------------------------------------------------------------------------------------------
---#4 Tentacle Warning
+-----------------------------------------------------------
+--#2 Xray
 
 local function VecUtil_Length(p1_x, p1_z)
     return math.sqrt(p1_x * p1_x + p1_z * p1_z)
@@ -141,7 +88,7 @@ local function ErodeAway(inst, erode_time)
         inst.DynamicShadow:Enable(false)
     end
 
-    inst:StartThread(function()
+    inst:StartThread(function(inst)
         local ticks = 0
         while ticks * tick_time < time_to_erode do
             local erode_amount = ticks * tick_time / time_to_erode
@@ -216,8 +163,62 @@ local function EnableTentacleWarning(inst)
     end
 end
 
+-----------------------------------------------------------
+--#3 Read
+
+local function peruse_brimstone(inst)
+    inst.components.sanity:DoDelta(-TUNING.SANITY_LARGE)
+end
+local function peruse_birds(inst)
+    inst.components.sanity:DoDelta(TUNING.SANITY_HUGE)
+end
+local function peruse_tentacles(inst)
+    inst.components.sanity:DoDelta(TUNING.SANITY_HUGE)
+end
+local function peruse_sleep(inst)
+    inst.components.sanity:DoDelta(TUNING.SANITY_LARGE)
+end
+local function peruse_gardening(inst)
+    inst.components.sanity:DoDelta(-TUNING.SANITY_LARGE)
+end
+
+-----------------------------------------------------------
+--#4 Eat
+
+local function onPreEat(food)
+    if food and food.components.edible then
+        if food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
+            if food.components.edible.healthvalue < 0 then
+                food.components.edible.healthvalue = 0
+            end
+            if food.components.edible.sanityvalue < 0 then
+                food.components.edible.sanityvalue = 0
+            end
+        end
+    end
+end
+
+local function onEat(inst, food)
+    if food and food.components.edible then
+        local food_health = food.components.edible.healthvalue
+        local food_hunger = food.components.edible.hungervalue
+        local food_sanity = food.components.edible.sanityvalue
+
+        --Wurt receives bonus food stats (need tweak?) TUNING.WURT_LOVES_VEGGIES == 1
+        if food.prefab == "durian" or food.prefab == "durian_cooked" then
+            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.6
+            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.6
+            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.6
+        elseif food.components.edible.foodtype == "SEEDS" or food.components.edible.foodtype == "VEGGIE" then
+            inst.components.health.currenthealth  = inst.components.health.currenthealth + food_health *0.33
+            inst.components.hunger.current = inst.components.hunger.current + food_hunger *0.33
+            inst.components.sanity.current = inst.components.sanity.current + food_sanity *0.33
+        end
+    end
+end
+
 ------------------------------------------------------------------------------------------------
---#5 Other perks
+--#5 Perks
 
 local function EnableSpeedBoost(inst)
     local ground = GetWorld()
@@ -259,8 +260,8 @@ local function mermbuilderfn(inst)
     GetPlayer().components.talker:Say(GetString(GetPlayer().prefab, "BUILD_MERMSTRUCTURES"))
 end
 
-------------------------------------------------------------------------------------------------
---#6 fn()
+-----------------------------------------------------------
+--#6 Save/Load
 
 local function OnSave(inst, data)
     data.health_percent = inst.health_percent or inst.components.health:GetPercent()
@@ -284,20 +285,23 @@ local function OnPreLoad(inst, data)
     end
 end
 
+-----------------------------------------------------------
+--#7 fn
+
 local function fn(inst)
     local minimap = inst.entity:AddMiniMapEntity()
     minimap:SetIcon( "wurt.tex" )
 
-    --//Tags
     inst:AddTag("playermerm")
-    inst:AddTag("merm")         --merms are neutral
+    inst:AddTag("merm")
     inst:AddTag("mermbuilder")  --gain sanity by building merm structures
-    inst:AddTag("mermfluent")   --read merm quotes
-    inst:AddTag("mermguard")    --befriend with mermguards
+    inst:AddTag("mermfluent")   --read merm languages
+    inst:AddTag("mermguard")
     inst:AddTag("wet")
     inst:AddTag("stronggrip")
 
-    --//Eating
+    ----------------------------------------------
+
     inst.components.eater.ablefoods = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
     inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
     inst.components.eater:SetOnEatFn(onEat)
@@ -312,33 +316,8 @@ local function fn(inst)
         return old(self, food, force)
     end
 
-    --//Reading
-    inst:AddComponent("reader")
-    inst.peruse_brimstone = peruse_brimstone
-    inst.peruse_birds = peruse_birds
-    inst.peruse_tentacles = peruse_tentacles
-    inst.peruse_sleep = peruse_sleep
-    inst.peruse_gardening = peruse_gardening
+    ----------------------------------------------
 
-    --//Resistant to moisture
-    TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
-
-    if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
-        inst:AddComponent("moisturelistener")
-        inst.components.moisturelistener.wetnessSpeed = 0.25
-        inst.components.moisturelistener.wetnessResistance = 0.5
-    end
-
-    --//Merm King
-    if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() then
-        inst:DoTaskInTime(0, RoyalUpgrade)
-    else
-        inst:DoTaskInTime(0, RoyalDowngrade)
-    end
-    inst:ListenForEvent("onmermkingcreated", RoyalUpgrade, GetWorld())
-    inst:ListenForEvent("onmermkingdestroyed", RoyalDowngrade, GetWorld())
-
-    --//Other perks
     inst:DoTaskInTime(0.1, EnableSpeedBoost)
     inst:DoTaskInTime(0.1, UpdateSpeedBoost)
 
@@ -348,14 +327,46 @@ local function fn(inst)
     inst:ListenForEvent("itemget", FishLover)
     inst:ListenForEvent("itemlose", FishLover)
 
-    if TUNING.WURT_LOVE_BUILDING == 1 then
+    ----------------------------------------------
+	
+    if TUNING.WURT_LOVES_BUILDINGS == 1 then
         inst.mermbuilderfn = mermbuilderfn
+    end
+	
+    if TUNING.WURT_LOVES_RAIN == 1 then
+        TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
         --inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
         --inst:ListenForEvent("rainstop", function(inst)  inst.components.locomotor.walkspeed = 6 end)
+        if IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3)) then
+            inst:AddComponent("moisturelistener")
+            inst.components.moisturelistener.wetnessSpeed = 0.25
+            inst.components.moisturelistener.wetnessResistance = 0.5
+        end
     end
+	
+    if TUNING.WURT_NO_DROWNING == 1 then	
+	    inst:AddComponent("resurrectable")
+		inst.components.resurrectable.cantdrown = true
+	end
+	
+    ----------------------------------------------
+
+    inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
+    inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, GetWorld())
+
+    inst:AddComponent("reader")
+    inst.peruse_brimstone = peruse_brimstone
+    inst.peruse_birds = peruse_birds
+    inst.peruse_tentacles = peruse_tentacles
+    inst.peruse_sleep = peruse_sleep
+    inst.peruse_gardening = peruse_gardening
 
     inst.OnSave = OnSave
     inst.OnPreLoad = OnPreLoad
+
+    inst:ListenForEvent("onmermkingcreated", RoyalUpgrade, GetWorld())
+    inst:ListenForEvent("onmermkingdestroyed", RoyalDowngrade, GetWorld())
 end
 
 return MakePlayerCharacter("wurt", prefabs, assets, fn, start_inv)
+

@@ -14,14 +14,14 @@ Assets =
 
 AddMinimapAtlas("minimap/wurt.xml")
 
-------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------
 
 --[[CONTENT]]
 --#1 AddModCharacter
 --#2 Tuning
 --#3 Perks
 
-------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------
 --#1 AddModCharacter
 
 local _G = GLOBAL
@@ -39,7 +39,7 @@ _S.NAMES.WURT = "Wurt"
 
 AddModCharacter("wurt")
 
-------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------
 --#2 Tuning
 
 TUNING.WURT_HEALTH = 150
@@ -52,27 +52,26 @@ TUNING.WURT_SANITY_KINGBONUS = 200
 
 TUNING.WURT_FISH_PRESERVER_RATE = 1/4
 
-TUNING.WURT_LOVES_RAIN = GetModConfigData("love_rain")
-TUNING.WURT_LOVES_WET = GetModConfigData("less_wetness")
 TUNING.WURT_LOVES_BUILDINGS = GetModConfigData("love_building")
+TUNING.WURT_LOVES_RAIN = GetModConfigData("love_rain")
 TUNING.WURT_LOVES_VEGGIES = GetModConfigData("love_veggie")
 TUNING.WURT_NO_DROWNING = GetModConfigData("no_drowning")
 
-------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------
 --#3 Perks
 
---Fish Preserver
+--3.1 Fish Preserver
 local function EnableFishPreserver(inst, holder)
     local holder = _G.GetPlayer()
-	if holder.prefab == "wurt" then
-		inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST*4)
-	else
-		inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST)
-	end
+    if holder.prefab == "wurt" then
+        inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST*4)
+    else
+        inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST)
+    end
 end
 
 local function DisableFishPreserver(inst, holder)
-	inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST)
+    inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERFAST)
 end
 
 local function UpdateFishPreserver(inst)
@@ -84,15 +83,11 @@ AddPrefabPostInit("eel", UpdateFishPreserver)
 AddPrefabPostInit("fish", UpdateFishPreserver)
 AddPrefabPostInit("tropical_fish", UpdateFishPreserver)
 
---Pig King does not accept Wurt's tributes unless Wurt is not a merm
-AddPrefabPostInit("pigking",
-    function(inst)
-        inst.components.trader:SetAcceptTest(
-            function(inst, item, giver)
-                local giver = GetPlayer()
-                return item.components.tradable.goldvalue > 0 and not giver:HasTag("merm")
-            end
-        )
-    end
-)
+--3.2 Pig king hates merms
+AddPrefabPostInit("pigking", function(inst)
+    inst.components.trader:SetAcceptTest(function(inst, item, giver)
+        local giver = GetPlayer()
+        return item.components.tradable.goldvalue > 0 and not giver:HasTag("merm")
+    end)
+end)
 
