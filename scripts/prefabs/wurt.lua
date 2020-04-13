@@ -346,7 +346,8 @@ local function fn(inst)
 	
     if TUNING.WURT_NO_DROWNING == 1 then	
 	    inst:AddComponent("resurrectable")
-		inst.components.resurrectable.cantdrown = true
+		inst.components.resurrectable.cantdrown = 1
+		inst.components.resurrectable.shouldwashuponbeach = 1
 	end
 	
     ----------------------------------------------
