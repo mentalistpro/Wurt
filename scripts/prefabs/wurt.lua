@@ -56,7 +56,7 @@ local function RoyalUpgrade(inst, silent)
 
     if not silent and not inst.royal then
         inst.royal = true
-        inst.components.talker:Say(GetString(inst, "ANNOUNCE_KINGCREATED"))
+        inst.components.talker:Say(GetString("wurt", "ANNOUNCE_KINGCREATED"))
         inst.sg:PushEvent("powerup_wurt")
         inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/transform_to")
     end
@@ -67,7 +67,7 @@ local function RoyalDowngrade(inst, silent)
 
     if not silent and inst.royal then
         inst.royal = nil
-        inst.components.talker:Say(GetString(inst, "ANNOUNCE_KINGDESTROYED"))
+        inst.components.talker:Say(GetString("wurt", "ANNOUNCE_KINGDESTROYED"))
         inst.sg:PushEvent("powerdown_wurt")
         inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/transform_from")
     end
