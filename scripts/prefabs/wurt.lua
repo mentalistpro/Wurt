@@ -328,12 +328,12 @@ local function fn(inst)
     inst:ListenForEvent("itemlose", FishLover)
 
     ----------------------------------------------
-	
-    if TUNING.WURT_LOVES_BUILDINGS == 1 then
+
+    if TUNING.WURT_LOVES_BUILDINGS == 0 then
         inst.mermbuilderfn = mermbuilderfn
     end
-	
-    if TUNING.WURT_LOVES_RAIN == 1 then
+
+    if TUNING.WURT_LOVES_RAIN == 0 then
         TUNING.MOISTURE_SANITY_PENALTY_MAX = TUNING.MOISTURE_SANITY_PENALTY_MAX /2
         --inst:ListenForEvent("rainstart", function(inst) inst.components.locomotor.walkspeed = 7.8 end)
         --inst:ListenForEvent("rainstop", function(inst)  inst.components.locomotor.walkspeed = 6 end)
@@ -343,13 +343,12 @@ local function fn(inst)
             inst.components.moisturelistener.wetnessResistance = 0.5
         end
     end
-	
-    if TUNING.WURT_NO_DROWNING == 1 then	
-	    inst:AddComponent("resurrectable")
-		inst.components.resurrectable.cantdrown = 1
-		inst.components.resurrectable.shouldwashuponbeach = 1
-	end
-	
+
+    if TUNING.WURT_NO_DROWNING == 0 then
+        inst:AddComponent("resurrectable")
+        inst.components.resurrectable.cantdrown = true
+    end
+
     ----------------------------------------------
 
     inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, GetWorld())
